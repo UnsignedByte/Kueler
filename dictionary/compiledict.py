@@ -1,9 +1,8 @@
-from collections import OrderedDict
 import itertools
 import re
 import pickle
 
-dct = OrderedDict()
+dct = {}
 
 oldword = ""
 toipa = {}
@@ -17,10 +16,11 @@ with open("cmudict.txt", 'r') as f:
         splitted = [removesuff.sub('', x) for x in a.strip().split()]
         word = splitted.pop(0)
         pronunciation = [toipa[i] for i in splitted]
-        if word in dct:
-            dct[word].append(' '.join(pronunciation))
+        if word == oldword:
+            dct[word].append('-'.join(pronunciation))
         else:
-            dct[word] = [' '.join(pronunciation)]
+            dct[word] = ['-'.join(pronunciation)]
+        oldword = word
 
 with open('compileddict.txt', 'wb') as f:
     pickle.dump(dct, f)

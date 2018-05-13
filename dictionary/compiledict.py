@@ -17,9 +17,9 @@ with open("cmudict.txt", 'r') as f:
         word = splitted.pop(0)
         pronunciation = [toipa[i] for i in splitted]
         if word == oldword:
-            dct[word].append('-'.join(pronunciation))
+            dct[word].append(''.join(pronunciation))
         else:
-            dct[word] = ['-'.join(pronunciation)]
+            dct[word] = [''.join(pronunciation)]
         oldword = word
 
 with open('compileddict.txt', 'wb') as f:

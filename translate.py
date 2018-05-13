@@ -15,7 +15,7 @@ while True:
     try:
         ud = re.sub(r'[a-zA-Z]+', lambda x:cmu[x.group().upper()][0], insent)
     except KeyError:
-        ud = insent
+        ud = re.sub(r'(\w)\1+', r'\1\1', insent)
         for a in normaltrans:
             try:
                 ud = re.sub(a[0], a[1]+r'\1', ud)

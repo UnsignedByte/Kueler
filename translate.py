@@ -21,20 +21,20 @@ with open("dictionary/dialect2.txt", 'r') as f:
 
 mods = ['', 'Y', 'O', 'OY']
 
+def transword(word):
+    try:
+        ud = cmu[word.upper()][0]
+    except KeyError:
+        ud = re.sub(r'(\w)\1+', r'\1\1', word).lower()
+        for a in normaltrans:
+            try:
+                ud = re.sub(a[0], a[1]+r'\1', ud)
+            except Exception:
+                ud = re.sub(a[0], a[1], ud)
+    return ud
+
 def translate(sentence):
-    transsent = []
-    for word in sentence.split():
-        try:
-            ud = re.sub(r'[a-zA-Z]+', lambda x:cmu[x.group().upper()][0], word)
-        except KeyError:
-            ud = re.sub(r'(\w)\1+', r'\1\1', word).lower()
-            for a in normaltrans:
-                try:
-                    ud = re.sub(a[0], a[1]+r'\1', ud)
-                except Exception:
-                    ud = re.sub(a[0], a[1], ud)
-        transsent.append(ud)
-    transsent = ' '.join(transsent)
+    transsent = re.sub(r'[\w\']+', lambda x:transword(x.group(0)), sentence)
     return (transsent,
             ' '.join(''.join(dialectrev[c]+mods[dialect[dialectrev[c]].index(c)] if c in dialectrev else c for c in x) for x in transsent.lower().split()),
             ' '.join(''.join(dialectrev2[c] if c in dialectrev2 else c for c in x) for x in transsent.lower().split())

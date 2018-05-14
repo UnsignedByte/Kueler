@@ -12,9 +12,10 @@ with open("toipa.txt", 'r') as f:
 
 with open("cmudict.txt", 'r') as f:
     for a in f.readlines():
-        removesuff = re.compile('(?:\(|\)|\d)')
-        splitted = [removesuff.sub('', x) for x in a.strip().split()]
-        word = splitted.pop(0)
+        splitted = a.strip().split()
+        word = re.sub(r'(?:\(\d*\))', '',  splitted.pop(0))
+        removesuff = re.compile(r'(?:\d)')
+        splitted = [removesuff.sub('', x) for x in splitted]
         pronunciation = [toipa[i] for i in splitted]
         replaced = ''.join(pronunciation).replace('ɝ', 'ɑɹ').replace('ɡ', 'g')
         if word == oldword:

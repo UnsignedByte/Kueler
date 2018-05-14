@@ -16,10 +16,11 @@ with open("cmudict.txt", 'r') as f:
         splitted = [removesuff.sub('', x) for x in a.strip().split()]
         word = splitted.pop(0)
         pronunciation = [toipa[i] for i in splitted]
+        replaced = ''.join(pronunciation).replace('ɝ', 'ɑɹ').replace('ɡ', 'g')
         if word == oldword:
-            dct[word].append(''.join(pronunciation))
+            dct[word].append(replaced)
         else:
-            dct[word] = [''.join(pronunciation)]
+            dct[word] = [replaced]
         oldword = word
 
 with open('compileddict.txt', 'wb') as f:

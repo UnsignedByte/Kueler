@@ -24,10 +24,8 @@ mods = ['', 'Y', 'O', 'OY']
 def translate(sentence):
     transsent = []
     for word in sentence.split():
-        print(word)
         try:
             ud = re.sub(r'[a-zA-Z]+', lambda x:cmu[x.group().upper()][0], word)
-            print(ud)
         except KeyError:
             ud = re.sub(r'(\w)\1+', r'\1\1', word).lower()
             for a in normaltrans:

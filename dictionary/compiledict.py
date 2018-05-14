@@ -26,3 +26,5 @@ with open("cmudict.txt", 'r') as f:
 
 with open('compileddict.txt', 'wb') as f:
     pickle.dump(dct, f)
+with open('compileddictrev.txt', 'wb') as f:
+    pickle.dump(dict((v,k) for k in dct for v in dct[k]), f)

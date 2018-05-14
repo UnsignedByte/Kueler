@@ -3,9 +3,12 @@ import re
 import itertools
 
 cmu = {}
+cmurev = {}
 normaltrans = {}
 
 with open("dictionary/compileddict.txt", 'rb') as f:
+    cmu = pickle.load(f)
+with open("dictionary/compileddictrev.txt", 'rb') as f:
     cmu = pickle.load(f)
 
 with open("dictionary/compiledipa.txt", 'rb') as f:
@@ -36,9 +39,24 @@ def transword(word):
 def translate(sentence):
     transsent = re.sub(r'[\w\']+', lambda x:transword(x.group(0)), sentence)
     return (transsent,
+            transsent,
             ' '.join(''.join(dialectrev[c]+mods[dialect[dialectrev[c]].index(c)] if c in dialectrev else c for c in x) for x in transsent.lower().split()),
-            ' '.join(''.join(dialectrev2[c] if c in dialectrev2 else c for c in x) for x in transsent.lower().split())
+            ' '.join(''.join((dialectrev2[c].lower() if dialect[dialectrev[c]].index(c)==1 else dialectrev2[c]) if c in dialectrev2 else c for c in x) for x in transsent.lower().split())
             )
+
+def untransword(word):
+    try:
+        ud = cmurev[word]
+    except KeyError:
+        for a in normaltrans:
+            try:
+                ud = re.sub(a[0], a[1]+r'\1', ud)
+            except Exception:
+                ud = re.sub(a[0], a[1], ud)
+    return ud
+
+def untranslate(sentence):
+    transsent = re.sub(r'[^\pP\s-]+', lambda x:untransword(x.group(0)), sentence)
 
 while True:
     print('\n\n'.join(translate(input())))

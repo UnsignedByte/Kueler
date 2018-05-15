@@ -3,13 +3,14 @@
 logs=$(dirname "$(pwd)")/logs
 echo "Logging to $logs."
 echo "" > "$logs"/log.txt
-echo "Build started at $(date).\n" >> "$logs"/log.txt
+echo "Build started at $(date)." >> "$logs"/log.txt
 echo "Running python " >> "$logs"/log.txt
 python3.6 -V >> "$logs"/log.txt
-echo "\n" >> "$logs"/log.txt
+echo "" >> "$logs"/log.txt
 
 cd ..
 python3.6 -u main.py >> "$logs"/log.txt 2>&1 &
+pid=$!
 cd server
 
 control_c() {
@@ -23,10 +24,23 @@ echo "" > "$logs"/build_log.txt
 
 while :
 do
+  if ! kill -0 "$pid"; then
+    echo "Server has crashed. Restarting..."  >> "$logs"/log.txt
+    echo "Build started at $(date)." >> "$logs"/log.txt
+    echo "Running python " >> "$logs"/log.txt
+    python3.6 -V >> "$logs"/log.txt
+    echo "" >> "$logs"/log.txt
+
+    pkill -f main.py >> "$logs"/log.txt
+
+    cd ..
+    python3.6 -u main.py >> "$logs"/log.txt 2>&1 &
+    pid=$!
+    cd server
+  fi
   blog=$(md5sum "$logs"/build_log.txt)
   git fetch >> "$logs"/build_log.txt 2>&1
-  if [ $? -eq  0 ]
-  then
+  if [ $? -eq  0 ]; then
     newblog=$(md5sum "$logs"/build_log.txt)
     if [ "$blog" != "$newblog" ]
     then
@@ -39,15 +53,16 @@ do
        echo $(date) >> "$logs"/build.html
        echo ".\n" >> "$logs"/build.html
 
-       echo "Build started at $(date).\n" >> "$logs"/log.txt
+       echo "Build started at $(date)." >> "$logs"/log.txt
        echo "Running python " >> "$logs"/log.txt
        python3.6 -V >> "$logs"/log.txt
-       echo "\n" >> "$logs"/log.txt
+       echo "" >> "$logs"/log.txt
 
-       pkill -f main.py
+       pkill -f main.py >> "$logs"/log.txt
 
        cd ..
        python3.6 -u main.py >> "$logs"/log.txt 2>&1 &
+       pid=$!
        cd server
 
        echo "Build finished at "

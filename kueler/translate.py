@@ -11,19 +11,19 @@ revtrans = []
 untransre = None
 normtransre = re.compile(r'(m|n|ŋ|p|t|k|b|d|ɡ|f|θ|s|ʃ|x|h|v|ð|z|ʒ|l|ɹ|j|w|ɪ|i|ʊ|u|e|ə|ɜ|ɔ|a|ɛ|æ|ʌ|ɒ|ɑ)')
 
-with open("dictionary/compileddict.txt", 'rb') as f:
+with open("data/dictionary/compileddict.txt", 'rb') as f:
     cmu = pickle.load(f)
-with open("dictionary/compileddictrev.txt", 'rb') as f:
+with open("data/dictionary/compileddictrev.txt", 'rb') as f:
     cmurev = pickle.load(f)
 
-with open("dictionary/compiledipa.txt", 'rb') as f:
+with open("data/dictionary/compiledipa.txt", 'rb') as f:
     normaltrans = pickle.load(f)
-with open("dictionary/compiledeng.txt", 'rb') as f:
+with open("data/dictionary/compiledeng.txt", 'rb') as f:
     revtrans = pickle.load(f)
     untransre = re.compile('|'.join(k for (k,v) in revtrans))
     revtrans = dict(revtrans)
 
-with open("dictionary/kueler.txt", 'r') as f:
+with open("data/dictionary/kueler.txt", 'r') as f:
     kueler = dict((k, re.findall('/(.*?)/', v)) for (k, v) in list(itertools.zip_longest(*[iter([a.strip() for a in f.readlines()])] * 2, fillvalue="")))
     kuelerrev = dict((v,k) for k in kueler for v in kueler[k])
 
@@ -31,8 +31,8 @@ mods = ['', 'Y', 'O', 'OY']
 def translate(sentence, f, t):
     return getattr(thismodule, f+t)(sentence)
 
-def engipa(sentence):
-    def engipaword(word):
+def englishipa(sentence):
+    def englishipaword(word):
         try:
             ud = cmu[word.upper()][0]
         except KeyError:
@@ -43,31 +43,27 @@ def engipa(sentence):
                 except Exception:
                     ud = re.sub(a[0], a[1], ud)
         return ud
-    transsent = re.sub(r'[\w\']+', lambda x:engipaword(x.group(0)), sentence)
+    transsent = re.sub(r'[\w\']+', lambda x:englishipaword(x.group(0)), sentence)
     return transsent
 
-def ipaeng(sentence):
-    def ipawordeng(word):
+def ipaenglish(sentence):
+    def ipawordenglish(word):
         try:
             ud = cmurev[word]
         except KeyError:
             ud = untransre.sub(lambda x:revtrans[x.group(0)], word).upper()
         return ud
-    transsent = re.sub(normtransre.pattern+r'+', lambda x:ipawordeng(x.group(0)), sentence)
+    transsent = re.sub(normtransre.pattern+r'+', lambda x:ipawordenglish(x.group(0)), sentence)
     return transsent
 
 def kueleripa(sentence):
     return re.sub(r'[a-zA-Z](?:h|H)?', lambda x:(lambda k:(kueler[k][0] if k.isupper() else kueler[k.upper()][1]))(x.group(0)), sentence)
 
 def ipakueler(sentence):
-    print(sentence)
     return normtransre.sub(lambda x:(lambda c:kuelerrev[c].lower() if kueler[kuelerrev[c]].index(c)==1 else kuelerrev[c])(x.group(0)), sentence)
 
-def kuelereng(sentence):
-    return ipaeng(kueleripa(sentence))
+def kuelerenglish(sentence):
+    return ipaenglish(kueleripa(sentence))
 
-def engkueler(sentence):
-    return ipakueler(engipa(sentence))
-
-while True:
-    print(translate(input(), 'eng', 'kueler'))
+def englishkueler(sentence):
+    return ipakueler(englishipa(sentence))

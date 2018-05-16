@@ -1,5 +1,6 @@
 # Kueler
 A dialect of english
+Add this bot to discord [here](https://discordapp.com/api/oauth2/authorize?client_id=445794557246832641&permissions=486464&scope=bot)!
 
 ## How it works
 

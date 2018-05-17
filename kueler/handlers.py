@@ -45,3 +45,4 @@ async def trans(Kueler, msg, match):
 
 
 message_handlers[r'translate (?P<s>.*) from (?P<f>.*?) to (?P<t>.*?)$']=trans
+message_handlers[r'translate (?:the following|this)? from (?P<f>.*?) to (?P<t>.*?):?\s+```(?P<s>.*)```$']=trans

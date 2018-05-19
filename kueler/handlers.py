@@ -27,7 +27,7 @@ message_handlers = {}
 async def on_message(Kueler, msg):
     if not msg.author.bot:
         for k in message_handlers:
-            match = re.match(re.compile(k, re.I), msg.content)
+            match = re.match(re.compile(k, re.I | re.MULTILINE), msg.content)
             if match:
                 await message_handlers[k](Kueler, msg, match)
 
@@ -44,5 +44,5 @@ async def trans(Kueler, msg, match):
     await Kueler.send_message(msg.channel, embed=em)
 
 
+message_handlers[r'translate (?:the following|this)? from (?P<f>.*?) to (?P<t>.*?):?\s+```(?P<s>(?:.|\n)*)```$']=trans
 message_handlers[r'translate (?P<s>.*) from (?P<f>.*?) to (?P<t>.*?)$']=trans
-message_handlers[r'translate (?:the following|this)? from (?P<f>.*?) to (?P<t>.*?):?\s+```(?P<s>.*)```$']=trans
